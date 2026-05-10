@@ -61,7 +61,6 @@ def get_response_log_probs(
     labels: torch.Tensor,
     return_token_entropy: bool,
 ) -> dict[str, torch.Tensor]:
-    
     logits = model(input_ids=input_ids).logits  # (batch, seq_len, vocab_size)
     
     log_probs_all = F.log_softmax(logits, dim=-1)
@@ -75,6 +74,16 @@ def get_response_log_probs(
         result["token_entropy"] = compute_entropy(logits)
     
     return result
+
+
+def masked_normalize(
+    tensor: torch.Tensor,
+    mask: torch.Tensor,
+    normalize_constant: float,
+    dim: int | None = None,
+) -> torch.Tensor:
+    masked = tensor.masked_fill(~mask, 0)
+    return torch.sum(masked, dim=dim) / normalize_constant
 
 
 if __name__ == "__main__":

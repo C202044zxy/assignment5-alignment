@@ -12,6 +12,7 @@ from cs336_alignment import (
     tokenize_prompt_and_output,
     compute_entropy,
     get_response_log_probs,
+    masked_normalize,
 )
 
 def run_tokenize_prompt_and_output(
@@ -272,7 +273,7 @@ def run_masked_normalize(
         torch.Tensor, the normalized sum, where masked elements
             (mask=0) don't contribute to the sum.
     """
-    raise NotImplementedError
+    return masked_normalize(tensor, mask, normalize_constant, dim)
 
 
 """
