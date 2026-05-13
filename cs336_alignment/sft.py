@@ -86,6 +86,23 @@ def masked_normalize(
     return torch.sum(masked, dim=dim) / normalize_constant
 
 
+def sft_microbatch_train_step(
+    policy_log_probs: torch.Tensor,
+    response_mask: torch.Tensor,
+    gradient_accumulation_steps: int,
+    normalize_constant: float = 1.0,
+) -> tuple[torch.Tensor, dict[str, torch.Tensor]]:
+    batch_size = policy_log_probs.shape[0]
+
+    loss = -masked_normalize(policy_log_probs, response_mask, normalize_constant)
+    loss = loss / (batch_size * gradient_accumulation_steps)
+    loss.backward()
+
+    metadata = {"loss": loss.detach()}
+
+    return (loss, metadata)
+
+
 if __name__ == "__main__":
     model = AutoModelForCausalLM.from_pretrained(
         "/data/models/Qwen2.5-Math-1.5B",

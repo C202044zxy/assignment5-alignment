@@ -3,6 +3,7 @@ from .sft import (
     compute_entropy,
     get_response_log_probs,
     masked_normalize,
+    sft_microbatch_train_step,
 )
 
 
@@ -11,4 +12,5 @@ __all__ = [
     "compute_entropy",
     "get_response_log_probs",
     "masked_normalize",
+    "sft_microbatch_train_step",
 ]
