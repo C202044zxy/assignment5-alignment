@@ -1,0 +1,4 @@
+{"train_step": 1, "epoch": 0, "loss": 87.5, "grad_norm": 640.0, "lr": 1e-05}
+{"train_step": 2, "epoch": 0, "loss": 77.0, "grad_norm": 596.0, "lr": 1e-05}
+{"train_step": 3, "epoch": 0, "loss": 60.0, "grad_norm": 584.0, "lr": 1e-05}
+{"train_step": 4, "epoch": 0, "loss": 38.75, "grad_norm": 372.0, "lr": 1e-05}
