@@ -14,7 +14,7 @@ from vllm.model_executor import set_random_seed as vllm_set_random_seed
 
 from cs336_alignment.drgrpo_grader import r1_zero_reward_fn
 from cs336_alignment.gsm8k_baseline import evaluate_vllm
-from cs336_alignment.sft import (
+from cs336_alignment.sft_helper import (
     get_response_log_probs,
     sft_microbatch_train_step,
     tokenize_prompt_and_output,
