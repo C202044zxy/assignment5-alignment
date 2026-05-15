@@ -151,6 +151,8 @@ def train(
     train_step = 0
     micro_step = 0
     eval_step = 0
+    entropy_accum = 0.0
+    entropy_count = 0
 
     with open(train_log_path, "w") as train_log, open(eval_log_path, "w") as eval_log:
 
@@ -187,13 +189,19 @@ def train(
                 labels = toks["labels"][:, :max_seq_len].to(device)
                 response_mask = toks["response_mask"][:, :max_seq_len].to(device).bool()
 
-                out = get_response_log_probs(policy, input_ids, labels, return_token_entropy=False)
+                out = get_response_log_probs(policy, input_ids, labels, return_token_entropy=True)
                 loss, _ = sft_microbatch_train_step(
                     policy_log_probs=out["log_probs"],
                     response_mask=response_mask,
                     gradient_accumulation_steps=gradient_accumulation_steps,
                     normalize_constant=1.0,
                 )
+
+                token_ent = out["token_entropy"]
+                mask_sum = response_mask.sum().clamp(min=1)
+                masked_ent = (token_ent * response_mask).sum() / mask_sum
+                entropy_accum += float(masked_ent.detach().item())
+                entropy_count += 1
 
                 micro_step += 1
                 if micro_step % gradient_accumulation_steps == 0:
@@ -202,12 +210,17 @@ def train(
                     optimizer.zero_grad(set_to_none=True)
                     train_step += 1
 
+                    mean_entropy = entropy_accum / max(entropy_count, 1)
+                    entropy_accum = 0.0
+                    entropy_count = 0
+
                     train_log.write(json.dumps({
                         "train_step": train_step,
                         "epoch": epoch,
                         "loss": float(loss.detach().item()) * gradient_accumulation_steps,
                         "grad_norm": float(grad_norm),
                         "lr": lr,
+                        "mean_response_entropy": mean_entropy,
                     }) + "\n")
                     train_log.flush()
 
