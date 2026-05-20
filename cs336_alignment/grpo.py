@@ -1,4 +1,5 @@
-from typing import Callable, Literal
+from collections.abc import Callable
+from typing import Literal
 
 import torch
 
@@ -45,7 +46,7 @@ def compute_group_normalized_reward(
 
 def compute_naive_policy_gradient_loss(
     raw_rewards_or_advantages: torch.Tensor,
-    policy_log_probs:torch.Tensor,
+    policy_log_probs: torch.Tensor,
 ) -> torch.Tensor:
     return torch.neg(raw_rewards_or_advantages * policy_log_probs)
 
@@ -61,7 +62,7 @@ def compute_grpo_clip_loss(
     unclipped_obj = ratio * advantages
     clipped_obj = clipped_ratio * advantages
     loss = -torch.min(unclipped_obj, clipped_obj)
-    is_clipped = (clipped_obj < unclipped_obj)
+    is_clipped = clipped_obj < unclipped_obj
     metadata: dict[str, torch.Tensor] = {"is_clipped": is_clipped}
     return (loss, metadata)
 
@@ -73,7 +74,7 @@ def compute_policy_gradient_loss(
     advantages: torch.Tensor | None = None,
     old_log_probs: torch.Tensor | None = None,
     cliprange: float | None = None,
-)-> tuple[torch.Tensor, dict[str, torch.Tensor]]:
+) -> tuple[torch.Tensor, dict[str, torch.Tensor]]:
     match loss_type:
         case "no_baseline":
             loss = compute_naive_policy_gradient_loss(raw_rewards, policy_log_probs)
@@ -90,3 +91,22 @@ def masked_mean(tensor: torch.Tensor, mask: torch.Tensor, dim: int | None = None
     num = torch.sum(mask, dim=dim)
     return torch.sum(masked, dim=dim) / num
 
+
+def grpo_microbatch_train_step(
+    policy_log_probs: torch.Tensor,
+    response_mask: torch.Tensor,
+    gradient_accumulation_steps: int,
+    loss_type: Literal["no_baseline", "reinforce_with_baseline", "grpo_clip"],
+    raw_rewards: torch.Tensor | None = None,
+    advantages: torch.Tensor | None = None,
+    old_log_probs: torch.Tensor | None = None,
+    cliprange: float | None = None,
+) -> tuple[torch.Tensor, dict[str, torch.Tensor]]:
+    policy_log_probs.shape[0]
+    token_loss, _ = compute_policy_gradient_loss(
+        policy_log_probs, loss_type, raw_rewards, advantages, old_log_probs, cliprange
+    )
+    loss = masked_mean(token_loss, response_mask) / gradient_accumulation_steps
+    loss.backward()
+    metadata: dict[str, torch.Tensor] = {}
+    return (loss, metadata)
