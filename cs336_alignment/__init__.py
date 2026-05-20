@@ -8,6 +8,7 @@ from .sft_helper import (
 from .grpo import (
     compute_group_normalized_reward,
     compute_naive_policy_gradient_loss,
+    compute_grpo_clip_loss,
 )
 
 
@@ -19,4 +20,5 @@ __all__ = [
     "sft_microbatch_train_step",
     "compute_group_normalized_reward",
     "compute_naive_policy_gradient_loss",
+    "compute_grpo_clip_loss",
 ]
