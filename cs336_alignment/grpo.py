@@ -30,3 +30,9 @@ def compute_group_normalized_reward(
     
     metadata: dict[str, float] = {}
     return (advantages, raw_rewards, metadata)
+
+def compute_naive_policy_gradient_loss(
+    raw_rewards_or_advantages: torch.Tensor,
+    policy_log_probs:torch.Tensor,
+) -> torch.Tensor:
+    return torch.neg(raw_rewards_or_advantages * policy_log_probs)

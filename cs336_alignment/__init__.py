@@ -7,6 +7,7 @@ from .sft_helper import (
 )
 from .grpo import (
     compute_group_normalized_reward,
+    compute_naive_policy_gradient_loss,
 )
 
 
@@ -16,5 +17,6 @@ __all__ = [
     "get_response_log_probs",
     "masked_normalize",
     "sft_microbatch_train_step",
-    "compute_group_normalized_reward"
+    "compute_group_normalized_reward",
+    "compute_naive_policy_gradient_loss",
 ]
