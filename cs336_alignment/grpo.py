@@ -84,3 +84,9 @@ def compute_policy_gradient_loss(
     metadata: dict[str, torch.Tensor] = {}
     return (loss, metadata)
 
+
+def masked_mean(tensor: torch.Tensor, mask: torch.Tensor, dim: int | None = None) -> torch.Tensor:
+    masked = tensor.masked_fill(~mask, 0)
+    num = torch.sum(mask, dim=dim)
+    return torch.sum(masked, dim=dim) / num
+

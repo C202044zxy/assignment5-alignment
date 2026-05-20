@@ -10,6 +10,7 @@ from .grpo import (
     compute_naive_policy_gradient_loss,
     compute_grpo_clip_loss,
     compute_policy_gradient_loss,
+    masked_mean,
 )
 
 
@@ -23,4 +24,5 @@ __all__ = [
     "compute_naive_policy_gradient_loss",
     "compute_grpo_clip_loss",
     "compute_policy_gradient_loss",
+    "masked_mean",
 ]
