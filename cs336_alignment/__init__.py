@@ -9,6 +9,7 @@ from .grpo import (
     compute_group_normalized_reward,
     compute_naive_policy_gradient_loss,
     compute_grpo_clip_loss,
+    compute_policy_gradient_loss,
 )
 
 
@@ -21,4 +22,5 @@ __all__ = [
     "compute_group_normalized_reward",
     "compute_naive_policy_gradient_loss",
     "compute_grpo_clip_loss",
+    "compute_policy_gradient_loss",
 ]

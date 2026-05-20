@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Callable, Literal
 
 import torch
 
@@ -64,3 +64,23 @@ def compute_grpo_clip_loss(
     is_clipped = (clipped_obj < unclipped_obj)
     metadata: dict[str, torch.Tensor] = {"is_clipped": is_clipped}
     return (loss, metadata)
+
+
+def compute_policy_gradient_loss(
+    policy_log_probs: torch.Tensor,
+    loss_type: Literal["no_baseline", "reinforce_with_baseline", "grpo_clip"],
+    raw_rewards: torch.Tensor | None = None,
+    advantages: torch.Tensor | None = None,
+    old_log_probs: torch.Tensor | None = None,
+    cliprange: float | None = None,
+)-> tuple[torch.Tensor, dict[str, torch.Tensor]]:
+    match loss_type:
+        case "no_baseline":
+            loss = compute_naive_policy_gradient_loss(raw_rewards, policy_log_probs)
+        case "reinforce_with_baseline":
+            loss = compute_naive_policy_gradient_loss(advantages, policy_log_probs)
+        case "grpo_clip":
+            loss, _ = compute_grpo_clip_loss(advantages, policy_log_probs, old_log_probs, cliprange)
+    metadata: dict[str, torch.Tensor] = {}
+    return (loss, metadata)
+
