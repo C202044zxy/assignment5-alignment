@@ -5,6 +5,9 @@ from .sft_helper import (
     masked_normalize,
     sft_microbatch_train_step,
 )
+from .grpo import (
+    compute_group_normalized_reward,
+)
 
 
 __all__ = [
@@ -13,4 +16,5 @@ __all__ = [
     "get_response_log_probs",
     "masked_normalize",
     "sft_microbatch_train_step",
+    "compute_group_normalized_reward"
 ]
